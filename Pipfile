@@ -1,0 +1,28 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+autopep8 = {index = "pypi",version = "*"}
+bandit = {index = "pypi",version = "*"}
+flake8 = {index = "pypi",version = "*"}
+flake8-import-order = {index = "pypi",version = "*"}
+flake8-blind-except = {index = "pypi",version = "*"}
+flake8-builtins = {index = "pypi",version = "*"}
+flake8-logging-format = {index = "pypi",version = "*"}
+flake8-docstrings = {index = "pypi",version = "*"}
+mock = {index = "pypi",version = "*"}
+more-itertools = {index = "pypi",version = "*"}
+pytest = {index = "pypi",version = "*"}
+
+[packages]
+etlstat = {index = "pypi",version = "*"}
+beautifuldict = {index = "pypi",version = "*"}
+gitpython = {index = "pypi",version = "*"}
+pandas = {index = "pypi",version = "*"}
+pyjstat = {index = "pypi",version = "*"}
+python-decouple = {index = "pypi",version = "*"}
+
+[requires]
+python_version = "3.7"
