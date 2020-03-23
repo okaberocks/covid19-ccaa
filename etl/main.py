@@ -65,9 +65,9 @@ def write_to_file(json_data, file_name):
 
 
 """First step: pull data from Github repository."""
-# repo = Repo(etl_cfg.input.source)
-# o = repo.remotes.origin
-# o.pull()
+repo = Repo(etl_cfg.input.source)
+o = repo.remotes.origin
+o.pull()
 
 """Second step: load .csv data files into dataframes."""
 data = csv(etl_cfg.input.dir_path, sep=',')
