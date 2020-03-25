@@ -15,7 +15,7 @@ from config import etl_cfg
 
 from etlstat.extractor.extractor import csv
 
-from git import Repo
+from git import GitCommandError, Repo
 
 from pyjstat import pyjstat
 
@@ -146,6 +146,9 @@ write_to_file(json, etl_cfg.output.path + 'fallecidos_cantabria.json-stat')
 """Fourth step: push JSON-Stat files to repository."""
 repo = Repo(etl_cfg.output.repository)
 repo.git.add('--all')
-repo.git.commit('-m', '"Automatic update"')
-origin = repo.remote(name='origin')
-origin.push()
+try:
+    repo.git.commit('-m', '"Automatic update"')
+    origin = repo.remote(name='origin')
+    origin.push()
+except GitCommandError:
+    pass
