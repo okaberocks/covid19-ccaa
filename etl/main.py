@@ -46,12 +46,18 @@ def deacumulate(df, variable1, variable2):
         df.loc[i-1, variable1]
     return df
 
-def to_json_stat(df, variable1, variable2):
+def to_json_stat(df, variable1, variable2=None):
     """Export dataframe to JSON-Stat dataset."""
-    df = df.melt(
-        id_vars=['fecha'],
-        value_vars=[variable1, variable2],
-        var_name='Variables')
+    if variable2:
+        df = df.melt(
+            id_vars=['fecha'],
+            value_vars=[variable1, variable2],
+            var_name='Variables')
+    else:
+        df = df.melt(
+            id_vars=['fecha'],
+            value_vars=[variable1],
+            var_name='Variables')
     df = df.sort_values(by=['fecha', 'Variables'])
     dataset = pyjstat.Dataset.read(df)
     metric = {'metric': ['Variables']}
@@ -119,9 +125,9 @@ casos = transform(casos, 'casos-acumulado')
 # cifra más reciente
 casos_last = casos.tail(1)
 casos_last.rename(columns={'casos-acumulado': 'casos'}, inplace=True)
-print(casos_last)
+json = to_json_stat(casos_last, 'casos')
+write_to_file(json, etl_cfg.output.path + 'casos_1_dato.json-stat')
 pass
-
 # dataset con datos diarios y acumulados
 casos = deacumulate(casos, 'casos-acumulado', 'casos')
 json = to_json_stat(casos, 'casos-acumulado', 'casos')
@@ -132,6 +138,11 @@ write_to_file(json, etl_cfg.output.path + 'casos_cantabria.json-stat')
 # fecha,cod_ine,CCAA,total
 altas = data[etl_cfg.input.files.altas]
 altas = transform(altas, 'altas-acumulado')
+# cifra más reciente
+altas_last = altas.tail(1)
+altas_last.rename(columns={'altas-acumulado': 'altas'}, inplace=True)
+json = to_json_stat(altas_last, 'altas')
+write_to_file(json, etl_cfg.output.path + 'altas_1_dato.json-stat')
 altas = deacumulate(altas, 'altas-acumulado', 'altas')
 json = to_json_stat(altas, 'altas-acumulado', 'altas')
 write_to_file(json, etl_cfg.output.path + 'altas_cantabria.json-stat')
