@@ -146,6 +146,6 @@ write_to_file(json, etl_cfg.output.path + 'fallecidos_cantabria.json-stat')
 """Fourth step: push JSON-Stat files to repository."""
 repo = Repo(etl_cfg.output.repository)
 repo.git.add('--all')
-repo.git.commit('-m', 'Automatic update')
+repo.git.commit('-m', '"Automatic update"')
 origin = repo.remote(name='origin')
 origin.push()
