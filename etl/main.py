@@ -130,6 +130,11 @@ write_to_file(json, etl_cfg.output.path + 'casos_1_dato.json-stat')
 casos = deacumulate(casos, 'casos-acumulado', 'casos')
 json = to_json_stat(casos, 'casos-acumulado', 'casos')
 write_to_file(json, etl_cfg.output.path + 'casos_cantabria.json-stat')
+# sólo diario
+casos_diario = casos
+casos_diario = casos_diario.drop('casos-acumulado', axis=1)
+json = to_json_stat(casos_diario, 'casos')
+write_to_file(json, etl_cfg.output.path + 'casos_diarios_cantabria.json-stat')
 
 # Altas en Cantabria
 # fecha,cod_ine,CCAA,total
