@@ -119,7 +119,6 @@ write_to_file(json, etl_cfg.output.path + 'todos_nacional.json-stat')
 
 # Casos en Cantabria
 # fecha,cod_ine,CCAA,total
-# diario y acumulado
 casos = data[etl_cfg.input.files.casos]
 casos = transform(casos, 'casos-acumulado')
 # cifra más reciente
@@ -127,12 +126,10 @@ casos_last = casos.tail(1)
 casos_last.rename(columns={'casos-acumulado': 'casos'}, inplace=True)
 json = to_json_stat(casos_last, 'casos')
 write_to_file(json, etl_cfg.output.path + 'casos_1_dato.json-stat')
-pass
-# dataset con datos diarios y acumulados
+# diario y acumulado
 casos = deacumulate(casos, 'casos-acumulado', 'casos')
 json = to_json_stat(casos, 'casos-acumulado', 'casos')
 write_to_file(json, etl_cfg.output.path + 'casos_cantabria.json-stat')
-
 
 # Altas en Cantabria
 # fecha,cod_ine,CCAA,total
@@ -143,6 +140,7 @@ altas_last = altas.tail(1)
 altas_last.rename(columns={'altas-acumulado': 'altas'}, inplace=True)
 json = to_json_stat(altas_last, 'altas')
 write_to_file(json, etl_cfg.output.path + 'altas_1_dato.json-stat')
+# diario y acumulado
 altas = deacumulate(altas, 'altas-acumulado', 'altas')
 json = to_json_stat(altas, 'altas-acumulado', 'altas')
 write_to_file(json, etl_cfg.output.path + 'altas_cantabria.json-stat')
@@ -151,14 +149,26 @@ write_to_file(json, etl_cfg.output.path + 'altas_cantabria.json-stat')
 # fecha,cod_ine,CCAA,total
 uci = data[etl_cfg.input.files.uci]
 uci = transform(uci, 'uci-acumulado')
+# cifra más reciente
+uci_last = uci.tail(1)
+uci_last.rename(columns={'uci-acumulado': 'uci'}, inplace=True)
+json = to_json_stat(uci_last, 'uci')
+write_to_file(json, etl_cfg.output.path + 'uci_1_dato.json-stat')
+# diario y acumulado
 uci = deacumulate(uci, 'uci-acumulado', 'uci')
 json = to_json_stat(uci, 'uci-acumulado', 'uci')
 write_to_file(json, etl_cfg.output.path + 'uci_cantabria.json-stat')
 
-# Número de fallecidos por CCAA
+# Fallecidos en Cantabria
 # fecha,cod_ine,CCAA,total
 fallecidos = data[etl_cfg.input.files.fallecidos]
 fallecidos = transform(fallecidos, 'fallecidos-acumulado')
+# cifra más reciente
+fallecidos_last = fallecidos.tail(1)
+fallecidos_last.rename(columns={'fallecidos-acumulado': 'fallecidos'}, inplace=True)
+json = to_json_stat(fallecidos_last, 'fallecidos')
+write_to_file(json, etl_cfg.output.path + 'fallecidos_1_dato.json-stat')
+# diario y acumulado
 fallecidos = deacumulate(fallecidos, 'fallecidos-acumulado', 'fallecidos')
 json = to_json_stat(fallecidos, 'fallecidos-acumulado', 'fallecidos')
 write_to_file(json, etl_cfg.output.path + 'fallecidos_cantabria.json-stat')
