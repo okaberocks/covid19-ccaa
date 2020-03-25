@@ -117,7 +117,7 @@ write_to_file(json, etl_cfg.output.path + 'todos_nacional.json-stat')
 casos = data[etl_cfg.input.files.casos]
 casos = transform(casos, 'casos-acumulado')
 # cifra más reciente
-casos_last = casos.iloc[-1]
+casos_last = casos.tail(1)
 print(casos_last)
 pass
 
