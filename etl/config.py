@@ -20,7 +20,8 @@ params = {
         }
     },
     'output': {
-        'path': resource_filename(__name__, 'data/')
+        'path': resource_filename(__name__, 'data/'),
+        'repository': config('REPOSITORY')
     }
 }
 etl_cfg = Baseconfig(params)
