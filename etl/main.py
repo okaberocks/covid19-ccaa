@@ -118,6 +118,7 @@ casos = data[etl_cfg.input.files.casos]
 casos = transform(casos, 'casos-acumulado')
 # cifra más reciente
 casos_last = casos.tail(1)
+casos_last.rename(columns={'casos-acumulado': 'casos'}, inplace=True)
 print(casos_last)
 pass
 
