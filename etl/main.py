@@ -173,7 +173,34 @@ fallecidos = deacumulate(fallecidos, 'fallecidos-acumulado', 'fallecidos')
 json = to_json_stat(fallecidos, 'fallecidos-acumulado', 'fallecidos')
 write_to_file(json, etl_cfg.output.path + 'fallecidos_cantabria.json-stat')
 
+# Todas las variables acumulado en Cantabria
+todas_acumulado = casos.merge(altas, how='left', on='fecha')
+todas_acumulado = todas_acumulado.merge(fallecidos, how='left', on='fecha')
+todas_acumulado = todas_acumulado.merge(uci, how='left', on='fecha')
+todas_acumulado.drop('casos', axis=1, inplace=True)
+todas_acumulado.drop('altas', axis=1, inplace=True)
+todas_acumulado.drop('fallecidos', axis=1, inplace=True)
+todas_acumulado.drop('uci', axis=1, inplace=True)
+todas_acumulado.rename(columns={
+    'casos-acumulado': 'casos',
+    'altas-acumulado': 'altas',
+    'fallecidos-acumulado': 'fallecidos',
+    'uci-acumulado': 'uci'}, inplace=True)
+todas_acumulado = todas_acumulado.melt(
+    id_vars=['fecha'],
+    value_vars=[
+        'casos', 'altas',
+        'fallecidos', 'uci'],
+    var_name='Variables')
+todas_acumulado = todas_acumulado.sort_values(by=['fecha', 'Variables'])
+dataset = pyjstat.Dataset.read(todas_acumulado)
+metric = {'metric': ['Variables']}
+dataset.setdefault('role', metric)
+json = dataset.write(output='jsonstat')
+write_to_file(json, etl_cfg.output.path + 'todos_cantabria.json-stat')
+
 """Fourth step: push JSON-Stat files to repository."""
+"""
 repo = Repo(etl_cfg.output.repository)
 repo.git.add('--all')
 try:
@@ -182,3 +209,4 @@ try:
     origin.push()
 except GitCommandError:
     pass
+"""
