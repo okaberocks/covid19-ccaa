@@ -113,11 +113,19 @@ write_to_file(json, etl_cfg.output.path + 'todos_nacional.json-stat')
 
 # Casos en Cantabria
 # fecha,cod_ine,CCAA,total
+# diario y acumulado
 casos = data[etl_cfg.input.files.casos]
 casos = transform(casos, 'casos-acumulado')
+# cifra más reciente
+casos_last = casos.iloc[-1]
+print(casos_last)
+pass
+
+# dataset con datos diarios y acumulados
 casos = deacumulate(casos, 'casos-acumulado', 'casos')
 json = to_json_stat(casos, 'casos-acumulado', 'casos')
 write_to_file(json, etl_cfg.output.path + 'casos_cantabria.json-stat')
+
 
 # Altas en Cantabria
 # fecha,cod_ine,CCAA,total
