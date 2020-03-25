@@ -200,7 +200,6 @@ json = dataset.write(output='jsonstat')
 write_to_file(json, etl_cfg.output.path + 'todos_cantabria.json-stat')
 
 """Fourth step: push JSON-Stat files to repository."""
-"""
 repo = Repo(etl_cfg.output.repository)
 repo.git.add('--all')
 try:
@@ -209,4 +208,3 @@ try:
     origin.push()
 except GitCommandError:
     pass
-"""
