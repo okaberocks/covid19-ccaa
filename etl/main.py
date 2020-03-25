@@ -205,12 +205,8 @@ json = dataset.write(output='jsonstat')
 write_to_file(json, etl_cfg.output.path + 'todos_cantabria.json-stat')
 
 # Comparación casos Cantabria y España
-espana = data[etl_cfg.input.files.nacional]
-espana.set_index('fecha')
-print(espana)
-cantabria = data[etl_cfg.input.files.casos]
-cantabria.set_index('fecha')
-print(cantabria)
+print(nacional)
+print(casos)
 
 """Fourth step: push JSON-Stat files to repository."""
 repo = Repo(etl_cfg.output.repository)
