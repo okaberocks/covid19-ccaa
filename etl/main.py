@@ -224,7 +224,6 @@ json = to_json_stat(cant_esp, 'casos-espana', 'casos-cantabria')
 write_to_file(json, etl_cfg.output.path + 'casos_cantabria_espana.json-stat')
 
 """Fourth step: push JSON-Stat files to repository."""
-"""
 repo = Repo(etl_cfg.output.repository)
 repo.git.add('--all')
 try:
@@ -233,4 +232,3 @@ try:
     origin.push()
 except GitCommandError:
     pass
-"""
