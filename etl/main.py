@@ -205,10 +205,26 @@ json = dataset.write(output='jsonstat')
 write_to_file(json, etl_cfg.output.path + 'todos_cantabria.json-stat')
 
 # Comparación casos Cantabria y España
-print(nacional)
-print(casos)
+espana = data[etl_cfg.input.files.nacional]
+cant_esp = espana.merge(casos, how='left', on='fecha')
+cant_esp.drop('altas-acumulado', axis=1, inplace=True)
+cant_esp.drop('fallecidos-acumulado', axis=1, inplace=True)
+cant_esp.drop('uci-acumulado', axis=1, inplace=True)
+cant_esp.drop('hospital-acumulado', axis=1, inplace=True)
+cant_esp.drop('casos_x', axis=1, inplace=True)
+cant_esp.drop('altas', axis=1, inplace=True)
+cant_esp.drop('fallecidos', axis=1, inplace=True)
+cant_esp.drop('uci', axis=1, inplace=True)
+cant_esp.drop('hospital', axis=1, inplace=True)
+cant_esp.drop('casos_y', axis=1, inplace=True)
+cant_esp.rename(columns={
+    'casos-acumulado_x': 'casos-espana',
+    'casos-acumulado_y': 'casos-cantabria'}, inplace=True)
+json = to_json_stat(cant_esp, 'casos-espana', 'casos-cantabria')
+write_to_file(json, etl_cfg.output.path + 'casos_cantabria_espana.json-stat')
 
 """Fourth step: push JSON-Stat files to repository."""
+"""
 repo = Repo(etl_cfg.output.repository)
 repo.git.add('--all')
 try:
@@ -217,3 +233,4 @@ try:
     origin.push()
 except GitCommandError:
     pass
+"""
