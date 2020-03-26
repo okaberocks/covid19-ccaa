@@ -59,7 +59,7 @@ def to_json_stat(df, variable1, variable2=None):
             value_vars=[variable1],
             var_name='Variables')
     df = df.sort_values(by=['fecha', 'Variables'])
-    dataset = pyjstat.Dataset.read(df)
+    dataset = pyjstat.Dataset.read(df, source=etl_cfg.metadata.source)
     metric = {'metric': ['Variables']}
     dataset.setdefault('role', metric)
     return dataset.write(output='jsonstat')
@@ -111,7 +111,7 @@ nacional = nacional.melt(
         'fallecidos', 'uci', 'hospital'],
     var_name='Variables')
 nacional = nacional.sort_values(by=['fecha', 'Variables'])
-dataset = pyjstat.Dataset.read(nacional)
+dataset = pyjstat.Dataset.read(nacional, source=etl_cfg.metadata.source)
 metric = {'metric': ['Variables']}
 dataset.setdefault('role', metric)
 json_file = dataset.write(output='jsonstat')
@@ -198,7 +198,7 @@ todas_acumulado = todas_acumulado.melt(
         'fallecidos', 'uci'],
     var_name='Variables')
 todas_acumulado = todas_acumulado.sort_values(by=['fecha', 'Variables'])
-dataset = pyjstat.Dataset.read(todas_acumulado)
+dataset = pyjstat.Dataset.read(todas_acumulado, source=etl_cfg.metadata.source)
 metric = {'metric': ['Variables']}
 dataset.setdefault('role', metric)
 json_file = dataset.write(output='jsonstat')
