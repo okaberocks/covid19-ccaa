@@ -21,7 +21,7 @@ etlstat = {index = "pypi",version = "*"}
 beautifuldict = {index = "pypi",version = "*"}
 gitpython = {index = "pypi",version = "*"}
 pandas = {index = "pypi",version = "*"}
-pyjstat = {index = "pypi",version = "*"}
+pyjstat = {index = "pypi","version >" = "2.2.0"}
 python-decouple = {index = "pypi",version = "*"}
 
 [requires]
