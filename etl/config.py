@@ -1,8 +1,14 @@
 from beautifuldict.baseconfig import Baseconfig
 
+import datetime
+
 from decouple import config
 
 from pkg_resources import resource_filename
+
+import pytz
+
+utc_now = pytz.utc.localize(datetime.datetime.utcnow())
 
 params = {
     'input': {
@@ -22,6 +28,12 @@ params = {
     'output': {
         'path': resource_filename(__name__, 'data/'),
         'repository': config('REPOSITORY')
+    },
+    'metadata': {
+        'label': "COVID19",
+        'source': 'Ministerio de Sanidad, Consumo y Bienestar Social',
+        'updated': utc_now.isoformat('T', 'seconds'),
+        'note': ''
     }
 }
 etl_cfg = Baseconfig(params)
