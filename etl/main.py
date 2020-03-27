@@ -133,8 +133,20 @@ write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria.json-stat')
 # sólo diario
 casos_diario = casos
 casos_diario = casos_diario.drop('casos-acumulado', axis=1)
+casos_tasa = casos_diario
 json_file = to_json_stat(casos_diario, 'casos')
 write_to_file(json_file, etl_cfg.output.path + 'casos_diarios_cantabria.json-stat')
+# tasa de variación diaria (porcentaje)
+# T(d) = 100 * ((Casos(d) - Casos(d-1))/Casos(d-1))
+for i in range(1, len(casos_tasa)):
+    if casos_tasa.loc[i-1, 'casos'] > 0:
+        casos_tasa.loc[i, 'variacion'] = 100 * (( \
+            casos_tasa.loc[i, 'casos'] - casos_tasa.loc[i-1, 'casos']) / \
+            casos_tasa.loc[i-1, 'casos'])
+    else:
+        casos_tasa.loc[i, 'variacion'] = None
+json_file = to_json_stat(casos_tasa, 'casos', 'variacion')
+write_to_file(json_file, etl_cfg.output.path + 'casos_variacion_cantabria.json-stat')
 
 # Altas en Cantabria
 # fecha,cod_ine,CCAA,total
