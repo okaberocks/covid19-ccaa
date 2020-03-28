@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"dimension": {"fecha": {"label": "fecha", "category": {"index": {"2020-03-28": 0}, "label": {"2020-03-28": "2020-03-28"}}}, "Variables": {"label": "Variables", "category": {"index": {"altas": 0}, "label": {"altas": "altas"}}}}, "value": [21], "version": "2.0", "class": "dataset", "updated": "2020-03-28T18:00:04.545072", "source": "Ministerio de Sanidad, Consumo y Bienestar Social. A partir de ficheros de datos elaborados por DATADISTA.COM", "id": ["fecha", "Variables"], "size": [1, 1], "role": {"metric": ["Variables"]}}
+=======
+{"dimension": {"fecha": {"label": "fecha", "category": {"index": {"2020-03-28": 0}, "label": {"2020-03-28": "2020-03-28"}}}, "Variables": {"label": "Variables", "category": {"index": {"altas": 0}, "label": {"altas": "altas"}}}}, "value": [21], "version": "2.0", "class": "dataset", "updated": "2020-03-28T16:35:29.898420", "source": "Ministerio de Sanidad, Consumo y Bienestar Social. A partir de ficheros de datos elaborados por DATADISTA.COM", "id": ["fecha", "Variables"], "size": [1, 1], "role": {"metric": ["Variables"]}}
+>>>>>>> 713c77b1554615e6b0fe89af56c74495ff176cfb
