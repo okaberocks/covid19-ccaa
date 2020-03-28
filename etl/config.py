@@ -25,7 +25,7 @@ params = {
         'repository': config('REPOSITORY')
     },
     'metadata': {
-        'source': 'Ministerio de Sanidad, Consumo y Bienestar Social',
+        'source': 'Ministerio de Sanidad, Consumo y Bienestar Social. A partir de ficheros de datos elaborados por DATADISTA.COM',
     }
 }
 etl_cfg = Baseconfig(params)
