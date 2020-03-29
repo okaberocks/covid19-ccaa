@@ -46,33 +46,19 @@ def deacumulate(df, variable1, variable2):
         df.loc[i-1, variable1]
     return df
 
-def to_json_stat(df, variable1, variable2=None):
-    """Export dataframe to JSON-Stat dataset."""
-    if variable2:
-        df = df.melt(
-            id_vars=['fecha'],
-            value_vars=[variable1, variable2],
-            var_name='Variables')
-    else:
-        df = df.melt(
-            id_vars=['fecha'],
-            value_vars=[variable1],
-            var_name='Variables')
-    df = df.sort_values(by=['fecha', 'Variables'])
-    dataset = pyjstat.Dataset.read(df, source=etl_cfg.metadata.source)
-    metric = {'metric': ['Variables']}
-    dataset.setdefault('role', metric)
-    return dataset.write(output='jsonstat')
-
-def to_json_nacional_edad_sexo(df, variable):
-    """Export dataframe to JSON-stat with a single variable."""
-    df_new = df[['rango_edad', 'sexo', variable]].copy()
-    df_new = df_new.melt(
-        id_vars=['rango_edad', 'sexo'],
-        value_vars=[variable],
+def to_json(df, id_vars, value_vars):
+    """Export dataframe to JSON-Stat dataset.
+    
+        id_vars (list): index columns
+        value_vars (list): numeric variables (metrics)
+    """
+    df = df.melt(
+        id_vars=id_vars,
+        value_vars=value_vars,
         var_name='Variables')
-    df_new = df_new.sort_values(by=['rango_edad', 'sexo', 'Variables'])
-    dataset = pyjstat.Dataset.read(df_new, source=etl_cfg.metadata.source)
+    id_vars.append('Variables')
+    df = df.sort_values(by=id_vars)
+    dataset = pyjstat.Dataset.read(df, source=etl_cfg.metadata.source)
     metric = {'metric': ['Variables']}
     dataset.setdefault('role', metric)
     return dataset.write(output='jsonstat')
@@ -115,20 +101,42 @@ for i in range(1, len(nacional)):
     nacional.loc[i-1, 'uci-acumulado']
     nacional.loc[i, 'hospital'] = nacional.loc[i, 'hospital-acumulado'] - \
     nacional.loc[i-1, 'hospital-acumulado']
-# Preparación del dataset
-nacional = nacional.melt(
-    id_vars=['fecha'],
-    value_vars=[
-        'casos-acumulado', 'altas-acumulado', 'fallecidos-acumulado',
-        'uci-acumulado', 'hospital-acumulado', 'casos', 'altas',
-        'fallecidos', 'uci', 'hospital'],
-    var_name='Variables')
-nacional = nacional.sort_values(by=['fecha', 'Variables'])
-dataset = pyjstat.Dataset.read(nacional, source=etl_cfg.metadata.source)
-metric = {'metric': ['Variables']}
-dataset.setdefault('role', metric)
-json_file = dataset.write(output='jsonstat')
-write_to_file(json_file, etl_cfg.output.path + 'todos_nacional.json-stat')
+
+# Datos acumulados
+nacional_acumulado = nacional[[
+    'fecha',
+    'casos-acumulado',
+    'altas-acumulado',
+    'fallecidos-acumulado',
+    'uci-acumulado',
+    'hospital-acumulado']].copy()
+nacional_acumulado.rename(
+    columns={
+        'casos-acumulado': 'casos',
+        'altas-acumulado': 'altas',
+        'fallecidos-acumulado': 'fallecidos',
+        'uci-acumulado': 'uci',
+        'hospital-acumulado': 'hospital'},
+        inplace=True)
+json_file = to_json(
+    nacional_acumulado,
+    ['fecha'],
+    ['casos', 'altas', 'fallecidos', 'uci', 'hospital'])
+write_to_file(json_file, etl_cfg.output.path + 'todos_nacional_acumulado.json-stat')
+
+# Datos diarios
+nacional_diario = nacional[[
+    'fecha',
+    'casos',
+    'altas',
+    'fallecidos',
+    'uci',
+    'hospital']].copy()
+json_file = to_json(
+    nacional_diario,
+    ['fecha'],
+    ['casos', 'altas', 'fallecidos', 'uci', 'hospital'])
+write_to_file(json_file, etl_cfg.output.path + 'todos_nacional_diario.json-stat')
 
 # Datos nacionales por rango de edad y sexo
 nacional_edad = data[etl_cfg.input.files.nacional_edad]
@@ -142,15 +150,22 @@ nacional_edad.rename(columns={
     'hospitalizados': 'hospital',
     'ingresos_uci': 'uci'
 }, inplace=True)
-json_file = to_json_nacional_edad_sexo(nacional_edad, 'casos')
-write_to_file(json_file, etl_cfg.output.path + 'casos_nacional_edad_sexo.json-stat')
-json_file = to_json_nacional_edad_sexo(nacional_edad, 'hospital')
-write_to_file(json_file, etl_cfg.output.path + 'hospital_nacional_edad_sexo.json-stat')
-json_file = to_json_nacional_edad_sexo(nacional_edad, 'uci')
-write_to_file(json_file, etl_cfg.output.path + 'uci_nacional_edad_sexo.json-stat')
-json_file = to_json_nacional_edad_sexo(nacional_edad, 'fallecidos')
-write_to_file(json_file, etl_cfg.output.path + 'fallecidos_nacional_edad_sexo.json-stat')
 
+nacional_edad_casos = nacional_edad[['rango_edad', 'sexo', 'casos']].copy()
+json_file = to_json(nacional_edad_casos, ['rango_edad', 'sexo'], ['casos'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_nacional_edad_sexo.json-stat')
+
+nacional_edad_hospital = nacional_edad[['rango_edad', 'sexo', 'hospital']].copy()
+json_file = to_json(nacional_edad_hospital, ['rango_edad', 'sexo'], ['hospital'])
+write_to_file(json_file, etl_cfg.output.path + 'hospital_nacional_edad_sexo.json-stat')
+
+nacional_edad_uci = nacional_edad[['rango_edad', 'sexo', 'uci']].copy()
+json_file = to_json(nacional_edad_uci, ['rango_edad', 'sexo'], ['uci'])
+write_to_file(json_file, etl_cfg.output.path + 'uci_nacional_edad_sexo.json-stat')
+
+nacional_edad_fallecidos = nacional_edad[['rango_edad', 'sexo', 'fallecidos']].copy()
+json_file = to_json(nacional_edad_fallecidos, ['rango_edad', 'sexo'], ['fallecidos'])
+write_to_file(json_file, etl_cfg.output.path + 'fallecidos_nacional_edad_sexo.json-stat')
 
 # Casos en Cantabria
 # fecha,cod_ine,CCAA,total
@@ -159,20 +174,25 @@ casos = transform(casos, 'casos-acumulado')
 # cifra más reciente
 casos_last = casos.tail(1)
 casos_last.rename(columns={'casos-acumulado': 'casos'}, inplace=True)
-json_file = to_json_stat(casos_last, 'casos')
-write_to_file(json_file, etl_cfg.output.path + 'casos_1_dato.json-stat')
-# diario y acumulado
+json_file = to_json(casos_last, ['fecha'], ['casos'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_1_dato.json-stat')
+
 casos = deacumulate(casos, 'casos-acumulado', 'casos')
-json_file = to_json_stat(casos, 'casos-acumulado', 'casos')
-write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria.json-stat')
-# sólo diario
-casos_diario = casos
-casos_diario = casos_diario.drop('casos-acumulado', axis=1)
-casos_tasa = casos_diario
-json_file = to_json_stat(casos_diario, 'casos')
-write_to_file(json_file, etl_cfg.output.path + 'casos_diarios_cantabria.json-stat')
+
+# acumulado
+casos_acumulado = casos[['fecha', 'casos-acumulado']].copy()
+casos_acumulado.rename(columns={'casos-acumulado': 'casos'}, inplace=True)
+json_file = to_json(casos_acumulado, ['fecha'], ['casos'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_acumulado.json-stat')
+
+# diario
+casos_diario = casos[['fecha', 'casos']].copy()
+json_file = to_json(casos_diario, ['fecha'], ['casos'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_diario.json-stat')
+
 # tasa de variación diaria (porcentaje)
 # T(d) = 100 * ((Casos(d) - Casos(d-1))/Casos(d-1))
+casos_tasa = casos_diario
 for i in range(1, len(casos_tasa)):
     if casos_tasa.loc[i-1, 'casos'] > 0:
         casos_tasa.loc[i, 'variacion'] = 100 * (( \
@@ -180,8 +200,8 @@ for i in range(1, len(casos_tasa)):
             casos_tasa.loc[i-1, 'casos'])
     else:
         casos_tasa.loc[i, 'variacion'] = None
-json_file = to_json_stat(casos_tasa, 'casos', 'variacion')
-write_to_file(json_file, etl_cfg.output.path + 'casos_variacion_cantabria.json-stat')
+json_file = to_json(casos_tasa, ['fecha'], ['casos', 'variacion'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_variacion.json-stat')
 
 # Altas en Cantabria
 # fecha,cod_ine,CCAA,total
@@ -190,12 +210,21 @@ altas = transform(altas, 'altas-acumulado')
 # cifra más reciente
 altas_last = altas.tail(1)
 altas_last.rename(columns={'altas-acumulado': 'altas'}, inplace=True)
-json_file = to_json_stat(altas_last, 'altas')
-write_to_file(json_file, etl_cfg.output.path + 'altas_1_dato.json-stat')
-# diario y acumulado
+json_file = to_json(altas_last, ['fecha'], ['altas'])
+write_to_file(json_file, etl_cfg.output.path + 'altas_cantabria_1_dato.json-stat')
+
 altas = deacumulate(altas, 'altas-acumulado', 'altas')
-json_file = to_json_stat(altas, 'altas-acumulado', 'altas')
-write_to_file(json_file, etl_cfg.output.path + 'altas_cantabria.json-stat')
+
+# acumulado
+altas_acumulado = altas[['fecha', 'altas-acumulado']].copy()
+altas_acumulado.rename(columns={'altas-acumulado': 'altas'}, inplace=True)
+json_file = to_json(altas_acumulado, ['fecha'], ['altas'])
+write_to_file(json_file, etl_cfg.output.path + 'altas_cantabria_acumulado.json-stat')
+
+# diario
+altas_diario = altas[['fecha', 'altas']].copy()
+json_file = to_json(altas_diario, ['fecha'], ['altas'])
+write_to_file(json_file, etl_cfg.output.path + 'altas_cantabria_diario.json-stat')
 
 # Ingresados en UCI en Cantabria
 # fecha,cod_ine,CCAA,total
@@ -204,12 +233,21 @@ uci = transform(uci, 'uci-acumulado')
 # cifra más reciente
 uci_last = uci.tail(1)
 uci_last.rename(columns={'uci-acumulado': 'uci'}, inplace=True)
-json_file = to_json_stat(uci_last, 'uci')
-write_to_file(json_file, etl_cfg.output.path + 'uci_1_dato.json-stat')
-# diario y acumulado
+json_file = to_json(uci_last, ['fecha'], ['uci'])
+write_to_file(json_file, etl_cfg.output.path + 'uci_cantabria_1_dato.json-stat')
+
 uci = deacumulate(uci, 'uci-acumulado', 'uci')
-json_file = to_json_stat(uci, 'uci-acumulado', 'uci')
-write_to_file(json_file, etl_cfg.output.path + 'uci_cantabria.json-stat')
+
+# acumulado
+uci_acumulado = uci[['fecha', 'uci-acumulado']].copy()
+uci_acumulado.rename(columns={'uci-acumulado': 'uci'}, inplace=True)
+json_file = to_json(uci_acumulado, ['fecha'], ['uci'])
+write_to_file(json_file, etl_cfg.output.path + 'uci_cantabria_acumulado.json-stat')
+
+# diario
+uci_diario = uci[['fecha', 'uci']].copy()
+json_file = to_json(uci_diario, ['fecha'], ['uci'])
+write_to_file(json_file, etl_cfg.output.path + 'uci_cantabria_diario.json-stat')
 
 # Fallecidos en Cantabria
 # fecha,cod_ine,CCAA,total
@@ -218,12 +256,21 @@ fallecidos = transform(fallecidos, 'fallecidos-acumulado')
 # cifra más reciente
 fallecidos_last = fallecidos.tail(1)
 fallecidos_last.rename(columns={'fallecidos-acumulado': 'fallecidos'}, inplace=True)
-json_file = to_json_stat(fallecidos_last, 'fallecidos')
-write_to_file(json_file, etl_cfg.output.path + 'fallecidos_1_dato.json-stat')
-# diario y acumulado
+json_file = to_json(fallecidos_last, ['fecha'], ['fallecidos'])
+write_to_file(json_file, etl_cfg.output.path + 'fallecidos_cantabria_1_dato.json-stat')
+
 fallecidos = deacumulate(fallecidos, 'fallecidos-acumulado', 'fallecidos')
-json_file = to_json_stat(fallecidos, 'fallecidos-acumulado', 'fallecidos')
-write_to_file(json_file, etl_cfg.output.path + 'fallecidos_cantabria.json-stat')
+
+# acumulado
+fallecidos_acumulado = fallecidos[['fecha', 'fallecidos-acumulado']].copy()
+fallecidos_acumulado.rename(columns={'fallecidos-acumulado': 'fallecidos'}, inplace=True)
+json_file = to_json(fallecidos_acumulado, ['fecha'], ['fallecidos'])
+write_to_file(json_file, etl_cfg.output.path + 'fallecidos_cantabria_acumulado.json-stat')
+
+# diario
+fallecidos_diario = fallecidos[['fecha', 'fallecidos']].copy()
+json_file = to_json(fallecidos_diario, ['fecha'], ['fallecidos'])
+write_to_file(json_file, etl_cfg.output.path + 'fallecidos_cantabria_diario.json-stat')
 
 # Todas las variables acumulado en Cantabria
 todas_acumulado = casos.merge(altas, how='left', on='fecha')
@@ -238,17 +285,10 @@ todas_acumulado.rename(columns={
     'altas-acumulado': 'altas',
     'fallecidos-acumulado': 'fallecidos',
     'uci-acumulado': 'uci'}, inplace=True)
-todas_acumulado = todas_acumulado.melt(
-    id_vars=['fecha'],
-    value_vars=[
-        'casos', 'altas',
-        'fallecidos', 'uci'],
-    var_name='Variables')
-todas_acumulado = todas_acumulado.sort_values(by=['fecha', 'Variables'])
-dataset = pyjstat.Dataset.read(todas_acumulado, source=etl_cfg.metadata.source)
-metric = {'metric': ['Variables']}
-dataset.setdefault('role', metric)
-json_file = dataset.write(output='jsonstat')
+json_file = to_json(
+    todas_acumulado,
+    ['fecha'],
+    ['casos', 'altas', 'fallecidos', 'uci'])
 write_to_file(json_file, etl_cfg.output.path + 'todos_cantabria.json-stat')
 
 # Comparación casos Cantabria y España
@@ -267,7 +307,7 @@ cant_esp.drop('casos_y', axis=1, inplace=True)
 cant_esp.rename(columns={
     'casos-acumulado_x': 'casos-espana',
     'casos-acumulado_y': 'casos-cantabria'}, inplace=True)
-json_file = to_json_stat(cant_esp, 'casos-espana', 'casos-cantabria')
+json_file = to_json(cant_esp, ['fecha'], ['casos-espana', 'casos-cantabria'])
 write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_espana.json-stat')
 
 """Fourth step: push JSON-Stat files to repository."""

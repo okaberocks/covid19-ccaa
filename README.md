@@ -1,10 +1,38 @@
 # covid19-ccaa
-Python scripts to process national and regional COVID19 data.
+Script en lenguaje Python para procesar datos nacionales y regionales sobre la epidemia de COVID19.
 
-Data provided by https://datadista.com
+Datos fuente proporcionados por https://datadista.com
 
-## Environment variables
+## Variables de entorno
 
-SOURCE environment variable stores the local path of the repository https://github.com/datadista/datasets
+La variable SOURCE environment almacena la ruta local del repositorio  https://github.com/datadista/datasets
 
-This repository provides daily updates of datasets in JSON-Stat format, about COVID19 in Spain.
+
+Este repositorio proporciona datos diarios actualizados sobre la evolución de la epidemia de COVID19 en España y Cantabria, en formato JSON-Stat.
+
+
+## Ficheros de resultados
+
+En etl/data:
+
++ **todos_nacional_acumulado.json-stat** -> Datos acumulados: 'fecha', 'casos', 'altas', 'fallecidos', 'uci', 'hospital'
++ **todos_nacional_diario.json-stat** -> Datos diarios: 'fecha', 'casos', 'altas', 'fallecidos', 'uci', 'hospital'
++ **casos_nacional_edad_sexo.json-stat** -> Dato más reciente: 'rango_edad', 'sexo', 'casos'
++ **hospital_nacional_edad_sexo.json-stat** -> Dato más reciente: 'rango_edad', 'sexo', 'hospital'
++ **uci_nacional_edad_sexo.json-stat** -> Dato más reciente: 'rango_edad', 'sexo', 'uci'
++ **fallecidos_nacional_edad_sexo.json-stat** -> Dato más reciente: 'rango_edad', 'sexo', 'fallecidos'
++ **casos_cantabria_1_dato.json-stat** -> Dato más reciente: 'fecha', 'casos'
++ **casos_cantabria_acumulado.json-stat** -> Datos acumulados: 'fecha', 'casos'
++ **casos_cantabria_diario.json-stat** -> Datos diarios: 'fecha', 'casos'
++ **casos_cantabria_variacion.json-stat** -> Tasa de variación diaria, en porcentaje: 'fecha', 'casos', 'variacion'
++ **altas_cantabria_1_dato.json-stat** -> Dato más reciente: 'fecha', 'altas'
++ **altas_cantabria_acumulado.json-stat** -> Datos acumulados: 'fecha', 'altas'
++ **altas_cantabria_diario.json-stat** -> Datos diarios: 'fecha', 'altas'
++ **uci_cantabria_1_dato.json-stat** -> Dato más reciente: 'fecha', 'uci'
++ **uci_cantabria_acumulado.json-stat** -> Datos acumulados: 'fecha', 'uci'
++ **uci_cantabria_diario.json-stat** -> Datos diarios: 'fecha', 'uci'
++ **fallecidos_cantabria_1_dato.json-stat** -> Dato más reciente: 'fecha', 'fallecidos'
++ **fallecidos_cantabria_acumulado.json-stat** -> Datos acumulados: 'fecha', 'fallecidos'
++ **fallecidos_cantabria_diario.json-stat** -> Datos diarios: 'fecha', 'fallecidos'
++ **todos_cantabria.json-stat** -> Datos acumulados: 'fecha', 'casos',     'altas', 'fallecidos', 'uci'
++ **casos_cantabria_espana.json-stat** -> Datos acumulados: 'fecha', 'casos-espana', 'casos-cantabria'
