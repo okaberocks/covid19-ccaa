@@ -1,6 +1,8 @@
 # covid19-ccaa
 Python scripts to process national and regional COVID19 data.
 
+Data provided by https://datadista.com
+
 ## Environment variables
 
 SOURCE environment variable stores the local path of the repository https://github.com/datadista/datasets
