@@ -64,6 +64,19 @@ def to_json_stat(df, variable1, variable2=None):
     dataset.setdefault('role', metric)
     return dataset.write(output='jsonstat')
 
+def to_json_nacional_edad_sexo(df, variable):
+    """Export dataframe to JSON-stat with a single variable."""
+    df_new = df[['rango_edad', 'sexo', variable]].copy()
+    df_new = df_new.melt(
+        id_vars=['rango_edad', 'sexo'],
+        value_vars=[variable],
+        var_name='Variables')
+    df_new = df_new.sort_values(by=['rango_edad', 'sexo', 'Variables'])
+    dataset = pyjstat.Dataset.read(df_new, source=etl_cfg.metadata.source)
+    metric = {'metric': ['Variables']}
+    dataset.setdefault('role', metric)
+    return dataset.write(output='jsonstat')
+
 def write_to_file(json_data, file_name):
     file = open(file_name, 'w')
     file.write(json_data)
@@ -116,6 +129,28 @@ metric = {'metric': ['Variables']}
 dataset.setdefault('role', metric)
 json_file = dataset.write(output='jsonstat')
 write_to_file(json_file, etl_cfg.output.path + 'todos_nacional.json-stat')
+
+# Datos nacionales por rango de edad y sexo
+nacional_edad = data[etl_cfg.input.files.nacional_edad]
+nacional_edad.drop(nacional_edad[nacional_edad.rango_edad == 'Total'].index, inplace=True)
+nacional_edad.drop(nacional_edad[nacional_edad.sexo == 'ambos'].index, inplace=True)
+last_date = nacional_edad['fecha'].max()
+nacional_edad.drop(nacional_edad[nacional_edad.fecha != last_date].index, inplace=True)
+nacional_edad.drop('fecha', axis=1, inplace=True)
+nacional_edad.rename(columns={
+    'casos_confirmados': 'casos',
+    'hospitalizados': 'hospital',
+    'ingresos_uci': 'uci'
+}, inplace=True)
+json_file = to_json_nacional_edad_sexo(nacional_edad, 'casos')
+write_to_file(json_file, etl_cfg.output.path + 'casos_nacional_edad_sexo.json-stat')
+json_file = to_json_nacional_edad_sexo(nacional_edad, 'hospital')
+write_to_file(json_file, etl_cfg.output.path + 'hospital_nacional_edad_sexo.json-stat')
+json_file = to_json_nacional_edad_sexo(nacional_edad, 'uci')
+write_to_file(json_file, etl_cfg.output.path + 'uci_nacional_edad_sexo.json-stat')
+json_file = to_json_nacional_edad_sexo(nacional_edad, 'fallecidos')
+write_to_file(json_file, etl_cfg.output.path + 'fallecidos_nacional_edad_sexo.json-stat')
+
 
 # Casos en Cantabria
 # fecha,cod_ine,CCAA,total

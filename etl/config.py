@@ -17,6 +17,7 @@ params = {
             'hospitalizados': 'ccaa_covid19_hospitalizados_long.csv',
             'mascarillas': 'ccaa_covid19_mascarillas.csv',
             'nacional': 'nacional_covid19.csv',
+            'nacional_edad': 'nacional_covid19_rango_edad.csv',
             'uci': 'ccaa_covid19_uci_long.csv'
         }
     },
