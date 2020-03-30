@@ -151,6 +151,21 @@ json_file = to_json(
     ['casos', 'altas', 'fallecidos', 'uci', 'hospital'])
 write_to_file(json_file, etl_cfg.output.path + 'todos_nacional_acumulado.json-stat')
 
+# Tasa de variación diaria (porcentaje)
+# T(d) = 100 * ((Casos(d) - Casos(d-1))/Casos(d-1))
+casos_nacional_tasa = nacional_acumulado[['fecha', 'casos']].copy()
+casos_nacional_tasa.reset_index(drop=True, inplace=True)
+for i in range(1, len(casos_nacional_tasa)):
+    if casos_nacional_tasa.loc[i-1, 'casos'] > 0:
+        casos_nacional_tasa.loc[i, 'variacion'] = 100 * (( \
+            casos_nacional_tasa.loc[i, 'casos'] - casos_nacional_tasa.loc[i-1, 'casos']) / \
+            casos_nacional_tasa.loc[i-1, 'casos'])
+    else:
+        casos_nacional_tasa.loc[i, 'variacion'] = None
+casos_nacional_tasa.drop('casos', axis=1, inplace=True)
+json_file = to_json(casos_nacional_tasa, ['fecha'], ['variacion'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_nacional_variacion.json-stat')
+
 # Datos diarios
 nacional_diario = nacional[[
     'fecha',
@@ -269,7 +284,9 @@ write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_diario.json-stat
 
 # tasa de variación diaria (porcentaje)
 # T(d) = 100 * ((Casos(d) - Casos(d-1))/Casos(d-1))
-casos_tasa = casos_acumulado
+casos_tasa = casos_acumulado[['fecha', 'casos']].copy()
+casos_tasa.drop(casos_tasa[casos_tasa.index < 9].index, inplace=True)
+casos_tasa.reset_index(drop=True, inplace=True)
 for i in range(1, len(casos_tasa)):
     if casos_tasa.loc[i-1, 'casos'] > 0:
         casos_tasa.loc[i, 'variacion'] = 100 * (( \

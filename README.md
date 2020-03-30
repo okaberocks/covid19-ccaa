@@ -26,6 +26,7 @@ En etl/data:
  + **altas_nacional_diario.json-stat** -> Datos diarios: 'fecha', 'altas'
  + **casos_nacional_1_dato.json-stat** -> Dato más reciente: 'fecha', 'casos'
  + **casos_nacional_diario.json-stat** -> Datos diarios: 'fecha', 'casos'
+ + **casos_nacional_variacion.json-stat** -> Datos acumulados: 'fecha', 'variacion'
  + **fallecidos_nacional_1_dato.json-stat** -> Dato más reciente: 'fecha', 'fallecidos'
  + **fallecidos_nacional_diario.json-stat** -> Datos diarios: 'fecha', 'fallecidos'
  + **hospital_nacional_1_dato.json-stat** -> Dato más reciente: 'fecha', 'hospital'
