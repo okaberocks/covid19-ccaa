@@ -22,7 +22,6 @@ En etl/data:
  + **fallecidos_nacional_edad_sexo.json-stat** -> Dato más reciente: 'rango_edad', 'sexo', 'fallecidos'
  + **hospital_nacional_edad_sexo.json-stat** -> Dato más reciente: 'rango_edad', 'sexo', 'hospital'
  + **uci_nacional_edad_sexo.json-stat** -> Dato más reciente: 'rango_edad', 'sexo', 'uci'
-+ en preparación
  + **altas_nacional_1_dato.json-stat** -> Dato más reciente: 'fecha', 'altas'
  + **altas_nacional_diario.json-stat** -> Datos diarios: 'fecha', 'altas'
  + **casos_nacional_1_dato.json-stat** -> Dato más reciente: 'fecha', 'casos'

@@ -97,6 +97,13 @@ json_file = to_json(
     ['fecha', 'ccaa'],
     ['casos', 'altas', 'fallecidos', 'hospital', 'uci'])
 write_to_file(json_file, etl_cfg.output.path + 'todos_ccaa_acumulado.json-stat')
+# Cifras más recientes, por CCAA
+last_date = todos_ccaa['fecha'].max()
+casos_ccaa_last = todos_ccaa[['fecha', 'ccaa', 'casos']].copy()
+casos_ccaa_last.drop(casos_ccaa_last[casos_ccaa_last.fecha != last_date].index, inplace=True)
+casos_ccaa_last.drop('fecha', axis=1, inplace=True)
+json_file = to_json(casos_ccaa_last, ['ccaa'], ['casos'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_ccaa_1_dato.json-stat')
 
 # Datos nacionales acumulados diarios
 # fecha,casos,altas,fallecimientos,ingresos_uci,hospitalizados
