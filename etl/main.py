@@ -158,6 +158,34 @@ json_file = to_json(
     ['casos', 'altas', 'fallecidos', 'uci', 'hospital'])
 write_to_file(json_file, etl_cfg.output.path + 'todos_nacional_diario.json-stat')
 
+# Cifras más recientes
+nacional_last = nacional.tail(1)
+# altas
+altas_nacional_last = nacional_last[['fecha', 'altas-acumulado']].copy()
+altas_nacional_last.rename(columns={'altas-acumulado': 'altas'}, inplace=True)
+json_file = to_json(altas_nacional_last, ['fecha'], ['altas'])
+write_to_file(json_file, etl_cfg.output.path + 'altas_nacional_1_dato.json-stat')
+# casos
+casos_nacional_last = nacional_last[['fecha', 'casos-acumulado']].copy()
+casos_nacional_last.rename(columns={'casos-acumulado': 'casos'}, inplace=True)
+json_file = to_json(casos_nacional_last, ['fecha'], ['casos'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_nacional_1_dato.json-stat')
+# fallecidos
+fallecidos_nacional_last = nacional_last[['fecha', 'fallecidos-acumulado']].copy()
+fallecidos_nacional_last.rename(columns={'fallecidos-acumulado': 'fallecidos'}, inplace=True)
+json_file = to_json(fallecidos_nacional_last, ['fecha'], ['fallecidos'])
+write_to_file(json_file, etl_cfg.output.path + 'fallecidos_nacional_1_dato.json-stat')
+# hospital
+hospital_nacional_last = nacional_last[['fecha', 'hospital-acumulado']].copy()
+hospital_nacional_last.rename(columns={'hospital-acumulado': 'hospital'}, inplace=True)
+json_file = to_json(hospital_nacional_last, ['fecha'], ['hospital'])
+write_to_file(json_file, etl_cfg.output.path + 'hospital_nacional_1_dato.json-stat')
+# uci
+uci_nacional_last = nacional_last[['fecha', 'uci-acumulado']].copy()
+uci_nacional_last.rename(columns={'uci-acumulado': 'uci'}, inplace=True)
+json_file = to_json(uci_nacional_last, ['fecha'], ['uci'])
+write_to_file(json_file, etl_cfg.output.path + 'uci_nacional_1_dato.json-stat')
+
 # Datos nacionales por rango de edad y sexo
 nacional_edad = data[etl_cfg.input.files.nacional_edad]
 nacional_edad.drop(nacional_edad[nacional_edad.rango_edad == 'Total'].index, inplace=True)
