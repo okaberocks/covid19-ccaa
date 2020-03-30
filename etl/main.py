@@ -20,16 +20,6 @@ from git import GitCommandError, Repo
 from pyjstat import pyjstat
 
 
-def normalize(df, variable):
-    """Normalize and filter regional data."""
-    df.drop(df[df.cod_ine != 6].index, inplace=True)
-    df.drop('cod_ine', axis=1, inplace=True)
-    df.set_index('CCAA')
-    df = df.melt(id_vars=['CCAA'], var_name='fecha')
-    df.drop('CCAA', axis=1, inplace=True)
-    df.rename(columns={'value': variable}, inplace=True)
-    return df
-
 def transform(df, variable):
     """Filter rows and drop columns."""
     df.drop(df[df.cod_ine != 6].index, inplace=True)
@@ -68,6 +58,15 @@ def write_to_file(json_data, file_name):
     file.write(json_data)
     file.close()
 
+def normalize_ccaa(df, variable):
+    """Rename and drop columns."""
+    df_new = df.rename(
+        columns={'CCAA': 'ccaa', 'total': variable})
+    df_new.drop('cod_ine', axis=1, inplace=True)
+    df_new.drop(df_new[df_new.ccaa == 'Total'].index, inplace=True)
+    df_new.set_index('fecha', 'ccaa')
+    return df_new
+
 
 """First step: pull data from Github repository."""
 repo = Repo(etl_cfg.input.source)
@@ -78,6 +77,27 @@ o.pull()
 data = csv(etl_cfg.input.dir_path, sep=',')
 
 """Third step: ETL processing."""
+# Datos nacionales acumulados, por comunidad autónoma
+ccaa_altas = data[etl_cfg.input.files.altas]
+ccaa_altas = normalize_ccaa(ccaa_altas, 'altas')
+ccaa_casos = data[etl_cfg.input.files.casos]
+ccaa_casos = normalize_ccaa(ccaa_casos, 'casos')
+ccaa_fallecidos = data[etl_cfg.input.files.fallecidos]
+ccaa_fallecidos = normalize_ccaa(ccaa_fallecidos, 'fallecidos')
+ccaa_hospital = data[etl_cfg.input.files.hospital]
+ccaa_hospital = normalize_ccaa(ccaa_hospital, 'hospital')
+ccaa_uci = data[etl_cfg.input.files.uci]
+ccaa_uci = normalize_ccaa(ccaa_uci, 'uci')
+todos_ccaa = ccaa_casos.merge(ccaa_altas, how='left', on=['fecha', 'ccaa'])
+todos_ccaa = todos_ccaa.merge(ccaa_fallecidos, how='left', on=['fecha', 'ccaa'])
+todos_ccaa = todos_ccaa.merge(ccaa_hospital, how='left', on=['fecha', 'ccaa'])
+todos_ccaa = todos_ccaa.merge(ccaa_uci, how='left', on=['fecha', 'ccaa'])
+json_file = to_json(
+    todos_ccaa,
+    ['fecha', 'ccaa'],
+    ['casos', 'altas', 'fallecidos', 'hospital', 'uci'])
+write_to_file(json_file, etl_cfg.output.path + 'todos_ccaa_acumulado.json-stat')
+
 # Datos nacionales acumulados diarios
 # fecha,casos,altas,fallecimientos,ingresos_uci,hospitalizados
 nacional = data[etl_cfg.input.files.nacional]
