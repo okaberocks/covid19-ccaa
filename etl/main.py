@@ -186,6 +186,28 @@ uci_nacional_last.rename(columns={'uci-acumulado': 'uci'}, inplace=True)
 json_file = to_json(uci_nacional_last, ['fecha'], ['uci'])
 write_to_file(json_file, etl_cfg.output.path + 'uci_nacional_1_dato.json-stat')
 
+# Series diarias
+#altas
+altas_nacional_diario = nacional[['fecha', 'altas']]
+json_file = to_json(altas_nacional_diario, ['fecha'], ['altas'])
+write_to_file(json_file, etl_cfg.output.path + 'altas_nacional_diario.json-stat')
+# casos
+casos_nacional_diario = nacional[['fecha', 'casos']]
+json_file = to_json(casos_nacional_diario, ['fecha'], ['casos'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_nacional_diario.json-stat')
+# fallecidos
+fallecidos_nacional_diario = nacional[['fecha', 'fallecidos']]
+json_file = to_json(fallecidos_nacional_diario, ['fecha'], ['fallecidos'])
+write_to_file(json_file, etl_cfg.output.path + 'fallecidos_nacional_diario.json-stat')
+# hospital
+hospital_nacional_diario = nacional[['fecha', 'hospital']]
+json_file = to_json(hospital_nacional_diario, ['fecha'], ['hospital'])
+write_to_file(json_file, etl_cfg.output.path + 'hospital_nacional_diario.json-stat')
+# uci
+uci_nacional_diario = nacional[['fecha', 'uci']]
+json_file = to_json(uci_nacional_diario, ['fecha'], ['uci'])
+write_to_file(json_file, etl_cfg.output.path + 'uci_nacional_diario.json-stat')
+
 # Datos nacionales por rango de edad y sexo
 nacional_edad = data[etl_cfg.input.files.nacional_edad]
 nacional_edad.drop(nacional_edad[nacional_edad.rango_edad == 'Total'].index, inplace=True)
