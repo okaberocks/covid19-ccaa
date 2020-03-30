@@ -277,7 +277,8 @@ for i in range(1, len(casos_tasa)):
             casos_tasa.loc[i-1, 'casos'])
     else:
         casos_tasa.loc[i, 'variacion'] = None
-json_file = to_json(casos_tasa, ['fecha'], ['casos', 'variacion'])
+casos_tasa.drop('casos', axis=1, inplace=True)
+json_file = to_json(casos_tasa, ['fecha'], ['variacion'])
 write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_variacion.json-stat')
 
 # Altas en Cantabria

@@ -40,7 +40,7 @@ En etl/data:
  + **casos_cantabria_acumulado.json-stat** -> Datos acumulados: 'fecha', 'casos'
  + **casos_cantabria_diario.json-stat** -> Datos diarios: 'fecha', 'casos'
  + **casos_cantabria_espana.json-stat** -> Datos acumulados: 'fecha', 'casos-espana', 'casos-cantabria'
- + **casos_cantabria_variacion.json-stat** -> Tasa de variación diaria, en porcentaje: 'fecha', 'casos', 'variacion'
+ + **casos_cantabria_variacion.json-stat** -> Tasa de variación diaria, en porcentaje: 'fecha', 'variacion'
  + **fallecidos_cantabria_1_dato.json-stat** -> Dato más reciente: 'fecha', 'fallecidos'
  + **fallecidos_cantabria_acumulado.json-stat** -> Datos acumulados: 'fecha', 'fallecidos'
  + **fallecidos_cantabria_diario.json-stat** -> Datos diarios: 'fecha', 'fallecidos'
