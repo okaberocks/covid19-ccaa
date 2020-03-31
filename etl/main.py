@@ -20,16 +20,6 @@ from git import GitCommandError, Repo
 from pyjstat import pyjstat
 
 
-def normalize(df, variable):
-    """Normalize and filter regional data."""
-    df.drop(df[df.cod_ine != 6].index, inplace=True)
-    df.drop('cod_ine', axis=1, inplace=True)
-    df.set_index('CCAA')
-    df = df.melt(id_vars=['CCAA'], var_name='fecha')
-    df.drop('CCAA', axis=1, inplace=True)
-    df.rename(columns={'value': variable}, inplace=True)
-    return df
-
 def transform(df, variable):
     """Filter rows and drop columns."""
     df.drop(df[df.cod_ine != 6].index, inplace=True)
@@ -68,6 +58,15 @@ def write_to_file(json_data, file_name):
     file.write(json_data)
     file.close()
 
+def normalize_ccaa(df, variable):
+    """Rename and drop columns."""
+    df_new = df.rename(
+        columns={'CCAA': 'ccaa', 'total': variable})
+    df_new.drop('cod_ine', axis=1, inplace=True)
+    df_new.drop(df_new[df_new.ccaa == 'Total'].index, inplace=True)
+    df_new.set_index('fecha', 'ccaa')
+    return df_new
+
 
 """First step: pull data from Github repository."""
 repo = Repo(etl_cfg.input.source)
@@ -78,6 +77,34 @@ o.pull()
 data = csv(etl_cfg.input.dir_path, sep=',')
 
 """Third step: ETL processing."""
+# Datos nacionales acumulados, por comunidad autónoma
+ccaa_altas = data[etl_cfg.input.files.altas]
+ccaa_altas = normalize_ccaa(ccaa_altas, 'altas')
+ccaa_casos = data[etl_cfg.input.files.casos]
+ccaa_casos = normalize_ccaa(ccaa_casos, 'casos')
+ccaa_fallecidos = data[etl_cfg.input.files.fallecidos]
+ccaa_fallecidos = normalize_ccaa(ccaa_fallecidos, 'fallecidos')
+ccaa_hospital = data[etl_cfg.input.files.hospital]
+ccaa_hospital = normalize_ccaa(ccaa_hospital, 'hospital')
+ccaa_uci = data[etl_cfg.input.files.uci]
+ccaa_uci = normalize_ccaa(ccaa_uci, 'uci')
+todos_ccaa = ccaa_casos.merge(ccaa_altas, how='left', on=['fecha', 'ccaa'])
+todos_ccaa = todos_ccaa.merge(ccaa_fallecidos, how='left', on=['fecha', 'ccaa'])
+todos_ccaa = todos_ccaa.merge(ccaa_hospital, how='left', on=['fecha', 'ccaa'])
+todos_ccaa = todos_ccaa.merge(ccaa_uci, how='left', on=['fecha', 'ccaa'])
+json_file = to_json(
+    todos_ccaa,
+    ['fecha', 'ccaa'],
+    ['casos', 'altas', 'fallecidos', 'hospital', 'uci'])
+write_to_file(json_file, etl_cfg.output.path + 'todos_ccaa_acumulado.json-stat')
+# Cifras más recientes, por CCAA
+last_date = todos_ccaa['fecha'].max()
+casos_ccaa_last = todos_ccaa[['fecha', 'ccaa', 'casos']].copy()
+casos_ccaa_last.drop(casos_ccaa_last[casos_ccaa_last.fecha != last_date].index, inplace=True)
+casos_ccaa_last.drop('fecha', axis=1, inplace=True)
+json_file = to_json(casos_ccaa_last, ['ccaa'], ['casos'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_ccaa_1_dato.json-stat')
+
 # Datos nacionales acumulados diarios
 # fecha,casos,altas,fallecimientos,ingresos_uci,hospitalizados
 nacional = data[etl_cfg.input.files.nacional]
@@ -124,6 +151,21 @@ json_file = to_json(
     ['casos', 'altas', 'fallecidos', 'uci', 'hospital'])
 write_to_file(json_file, etl_cfg.output.path + 'todos_nacional_acumulado.json-stat')
 
+# Tasa de variación diaria (porcentaje)
+# T(d) = 100 * ((Casos(d) - Casos(d-1))/Casos(d-1))
+casos_nacional_tasa = nacional_acumulado[['fecha', 'casos']].copy()
+casos_nacional_tasa.reset_index(drop=True, inplace=True)
+for i in range(1, len(casos_nacional_tasa)):
+    if casos_nacional_tasa.loc[i-1, 'casos'] > 0:
+        casos_nacional_tasa.loc[i, 'variacion'] = 100 * (( \
+            casos_nacional_tasa.loc[i, 'casos'] - casos_nacional_tasa.loc[i-1, 'casos']) / \
+            casos_nacional_tasa.loc[i-1, 'casos'])
+    else:
+        casos_nacional_tasa.loc[i, 'variacion'] = None
+casos_nacional_tasa.drop('casos', axis=1, inplace=True)
+json_file = to_json(casos_nacional_tasa, ['fecha'], ['variacion'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_nacional_variacion.json-stat')
+
 # Datos diarios
 nacional_diario = nacional[[
     'fecha',
@@ -137,6 +179,56 @@ json_file = to_json(
     ['fecha'],
     ['casos', 'altas', 'fallecidos', 'uci', 'hospital'])
 write_to_file(json_file, etl_cfg.output.path + 'todos_nacional_diario.json-stat')
+
+# Cifras más recientes
+nacional_last = nacional.tail(1)
+# altas
+altas_nacional_last = nacional_last[['fecha', 'altas-acumulado']].copy()
+altas_nacional_last.rename(columns={'altas-acumulado': 'altas'}, inplace=True)
+json_file = to_json(altas_nacional_last, ['fecha'], ['altas'])
+write_to_file(json_file, etl_cfg.output.path + 'altas_nacional_1_dato.json-stat')
+# casos
+casos_nacional_last = nacional_last[['fecha', 'casos-acumulado']].copy()
+casos_nacional_last.rename(columns={'casos-acumulado': 'casos'}, inplace=True)
+json_file = to_json(casos_nacional_last, ['fecha'], ['casos'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_nacional_1_dato.json-stat')
+# fallecidos
+fallecidos_nacional_last = nacional_last[['fecha', 'fallecidos-acumulado']].copy()
+fallecidos_nacional_last.rename(columns={'fallecidos-acumulado': 'fallecidos'}, inplace=True)
+json_file = to_json(fallecidos_nacional_last, ['fecha'], ['fallecidos'])
+write_to_file(json_file, etl_cfg.output.path + 'fallecidos_nacional_1_dato.json-stat')
+# hospital
+hospital_nacional_last = nacional_last[['fecha', 'hospital-acumulado']].copy()
+hospital_nacional_last.rename(columns={'hospital-acumulado': 'hospital'}, inplace=True)
+json_file = to_json(hospital_nacional_last, ['fecha'], ['hospital'])
+write_to_file(json_file, etl_cfg.output.path + 'hospital_nacional_1_dato.json-stat')
+# uci
+uci_nacional_last = nacional_last[['fecha', 'uci-acumulado']].copy()
+uci_nacional_last.rename(columns={'uci-acumulado': 'uci'}, inplace=True)
+json_file = to_json(uci_nacional_last, ['fecha'], ['uci'])
+write_to_file(json_file, etl_cfg.output.path + 'uci_nacional_1_dato.json-stat')
+
+# Series diarias
+#altas
+altas_nacional_diario = nacional[['fecha', 'altas']]
+json_file = to_json(altas_nacional_diario, ['fecha'], ['altas'])
+write_to_file(json_file, etl_cfg.output.path + 'altas_nacional_diario.json-stat')
+# casos
+casos_nacional_diario = nacional[['fecha', 'casos']]
+json_file = to_json(casos_nacional_diario, ['fecha'], ['casos'])
+write_to_file(json_file, etl_cfg.output.path + 'casos_nacional_diario.json-stat')
+# fallecidos
+fallecidos_nacional_diario = nacional[['fecha', 'fallecidos']]
+json_file = to_json(fallecidos_nacional_diario, ['fecha'], ['fallecidos'])
+write_to_file(json_file, etl_cfg.output.path + 'fallecidos_nacional_diario.json-stat')
+# hospital
+hospital_nacional_diario = nacional[['fecha', 'hospital']]
+json_file = to_json(hospital_nacional_diario, ['fecha'], ['hospital'])
+write_to_file(json_file, etl_cfg.output.path + 'hospital_nacional_diario.json-stat')
+# uci
+uci_nacional_diario = nacional[['fecha', 'uci']]
+json_file = to_json(uci_nacional_diario, ['fecha'], ['uci'])
+write_to_file(json_file, etl_cfg.output.path + 'uci_nacional_diario.json-stat')
 
 # Datos nacionales por rango de edad y sexo
 nacional_edad = data[etl_cfg.input.files.nacional_edad]
@@ -192,7 +284,9 @@ write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_diario.json-stat
 
 # tasa de variación diaria (porcentaje)
 # T(d) = 100 * ((Casos(d) - Casos(d-1))/Casos(d-1))
-casos_tasa = casos_diario
+casos_tasa = casos_acumulado[['fecha', 'casos']].copy()
+casos_tasa.drop(casos_tasa[casos_tasa.index < 9].index, inplace=True)
+casos_tasa.reset_index(drop=True, inplace=True)
 for i in range(1, len(casos_tasa)):
     if casos_tasa.loc[i-1, 'casos'] > 0:
         casos_tasa.loc[i, 'variacion'] = 100 * (( \
@@ -200,7 +294,8 @@ for i in range(1, len(casos_tasa)):
             casos_tasa.loc[i-1, 'casos'])
     else:
         casos_tasa.loc[i, 'variacion'] = None
-json_file = to_json(casos_tasa, ['fecha'], ['casos', 'variacion'])
+casos_tasa.drop('casos', axis=1, inplace=True)
+json_file = to_json(casos_tasa, ['fecha'], ['variacion'])
 write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_variacion.json-stat')
 
 # Altas en Cantabria
