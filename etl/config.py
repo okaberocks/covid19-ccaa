@@ -27,4 +27,25 @@ params = {
         'source': 'Ministerio de Sanidad, Consumo y Bienestar Social. A partir de ficheros de datos elaborados por DATADISTA.COM',
     }
 }
+
 etl_cfg = Baseconfig(params)
+
+"""
+    files = {
+    cfg.output.hospitalizations: {
+        "content": hospitalizations_json
+    },
+    cfg.output.ucis: {
+        "content": ucis_json
+    },
+    cfg.output.sanitarians: {
+        "content": sanitarians_json
+    },
+    cfg.output.elder: {
+        "content": elder_json
+    }
+    utils.publish_gist(files,
+                   cfg.labels.hospitalizations_gist,
+                   cfg.github.hospitalizations_gist_id)
+    }
+"""
