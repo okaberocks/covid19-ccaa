@@ -81,12 +81,14 @@ data = csv(etl_cfg.input.dir_path, sep=',')
 """Third step: ETL processing."""
 # Alojamientos turísticos BOE 2020 4194
 alojamientos = data[etl_cfg.input.files.alojamientos]
-alojamientos.rename(columns={'CCAA': 'ccaa'}, inplace=True)
+alojamientos.rename(
+    columns={'CCAA': 'ccaa', 'lat': 'Latitud', 'long': 'Longitud'},
+    inplace=True)
 alojamientos['id'] = arange(len(alojamientos))
 json_file = to_json(
     alojamientos,
     ['id'],
-    ['ccaa', 'provincia', 'localidad', 'nombre', 'lat', 'long'])
+    ['ccaa', 'provincia', 'localidad', 'nombre', 'Latitud', 'Longitud'])
 write_to_file(json_file, etl_cfg.output.path + 'alojamientos_turisticos.json-stat')
 
 # Datos nacionales acumulados, por comunidad autónoma
