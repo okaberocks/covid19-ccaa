@@ -10,6 +10,7 @@ params = {
         'source': config('SOURCE'),
         'dir_path': config('SOURCE') + 'COVID 19/',
         'files': {
+            'alojamientos': 'alojamientos_turisticos_boe_2020_4194.csv',
             'altas': 'ccaa_covid19_altas_long.csv',
             'casos': 'ccaa_covid19_casos_long.csv',
             'fallecidos': 'ccaa_covid19_fallecidos_long.csv',

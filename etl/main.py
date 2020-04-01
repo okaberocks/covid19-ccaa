@@ -17,6 +17,8 @@ from etlstat.extractor.extractor import csv
 
 from git import GitCommandError, Repo
 
+from numpy import arange
+
 from pyjstat import pyjstat
 
 
@@ -77,6 +79,16 @@ o.pull()
 data = csv(etl_cfg.input.dir_path, sep=',')
 
 """Third step: ETL processing."""
+# Alojamientos turísticos BOE 2020 4194
+alojamientos = data[etl_cfg.input.files.alojamientos]
+alojamientos.rename(columns={'CCAA': 'ccaa'}, inplace=True)
+alojamientos['id'] = arange(len(alojamientos))
+json_file = to_json(
+    alojamientos,
+    ['id'],
+    ['ccaa', 'provincia', 'localidad', 'nombre', 'lat', 'long'])
+write_to_file(json_file, etl_cfg.output.path + 'alojamientos_turisticos.json-stat')
+
 # Datos nacionales acumulados, por comunidad autónoma
 ccaa_altas = data[etl_cfg.input.files.altas]
 ccaa_altas = normalize_ccaa(ccaa_altas, 'altas')
