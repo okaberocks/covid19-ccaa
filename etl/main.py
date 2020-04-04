@@ -79,6 +79,26 @@ o.pull()
 data = csv(etl_cfg.input.dir_path, sep=',')
 
 """Third step: ETL processing."""
+# Puntos de restauración
+restauracion = data[etl_cfg.input.files.restauracion]
+restauracion.rename(
+    columns = {
+        'NOMBRE': 'nombre',
+        'DIRECCION': 'direccion',
+        'CIUDAD': 'ciudad',
+        'PROVINCIA': 'provincia',
+        'LATITUD': 'Latitud',
+        'LONGITUD': 'Longitud',
+        'COMENTARIO': 'comentario'
+    }, inplace=True)
+restauracion['id'] = arange(len(restauracion))
+json_file = to_json(
+    restauracion,
+    ['id'],
+    ['nombre', 'direccion', 'ciudad',
+     'provincia', 'Latitud', 'Longitud', 'comentario'])
+write_to_file(json_file, etl_cfg.output.path + 'puntos_restauracion.json-stat')
+
 # Alojamientos turísticos BOE 2020 4194
 alojamientos = data[etl_cfg.input.files.alojamientos]
 alojamientos.rename(

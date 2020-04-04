@@ -17,6 +17,7 @@ params = {
             'hospital': 'ccaa_covid19_hospitalizados_long.csv',
             'nacional': 'nacional_covid19.csv',
             'nacional_edad': 'nacional_covid19_rango_edad.csv',
+            'restauracion': 'puntos_restauracion_comida_para_llevar.csv',
             'uci': 'ccaa_covid19_uci_long.csv'
         }
     },
