@@ -429,17 +429,15 @@ todas_acumulado.drop('casos', axis=1, inplace=True)
 todas_acumulado.drop('altas', axis=1, inplace=True)
 todas_acumulado.drop('fallecidos', axis=1, inplace=True)
 todas_acumulado.drop('uci', axis=1, inplace=True)
-"""
 todas_acumulado.rename(columns={
     'casos-acumulado': 'casos',
     'altas-acumulado': 'altas',
     'fallecidos-acumulado': 'fallecidos',
     'uci-acumulado': 'uci'}, inplace=True)
-"""
 json_file = to_json(
     todas_acumulado,
     ['fecha'],
-    ['casos-acumulado', 'altas-acumulado', 'fallecidos-acumulado', 'uci-acumulado'])
+    ['casos', 'altas', 'fallecidos', 'uci'])
 write_to_file(json_file, etl_cfg.output.path + 'todos_cantabria.json-stat')
 
 # Comparación casos Cantabria y España
