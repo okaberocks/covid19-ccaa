@@ -13,6 +13,8 @@ It performs the following actions:
 """Import configuration."""
 from config import etl_cfg
 
+from datetime import datetime, timedelta
+
 from etlstat.extractor.extractor import csv
 
 from git import GitCommandError, Repo
@@ -69,6 +71,14 @@ def normalize_ccaa(df, variable):
     df_new.set_index('fecha', 'ccaa')
     return df_new
 
+def delay_date(df):
+    """Change dates to previous day."""
+    for i in range(0, len(df)):
+        delay_date = datetime.strptime(df.loc[i, 'fecha'], '%Y-%m-%d')
+        delay_date = delay_date - timedelta(days=1)
+        delay_date_str = delay_date.strftime('%Y-%m-%d')
+        df.loc[i, 'fecha'] = delay_date_str
+    return df
 
 """First step: pull data from Github repository."""
 repo = Repo(etl_cfg.input.source)
@@ -114,14 +124,19 @@ write_to_file(json_file, etl_cfg.output.path + 'alojamientos_turisticos.json-sta
 # Datos nacionales acumulados, por comunidad autónoma
 ccaa_altas = data[etl_cfg.input.files.altas]
 ccaa_altas = normalize_ccaa(ccaa_altas, 'altas')
+ccaa_altas = delay_date(ccaa_altas)
 ccaa_casos = data[etl_cfg.input.files.casos]
 ccaa_casos = normalize_ccaa(ccaa_casos, 'casos')
+ccaa_casos = delay_date(ccaa_casos)
 ccaa_fallecidos = data[etl_cfg.input.files.fallecidos]
 ccaa_fallecidos = normalize_ccaa(ccaa_fallecidos, 'fallecidos')
+ccaa_fallecidos = delay_date(ccaa_fallecidos)
 ccaa_hospital = data[etl_cfg.input.files.hospital]
 ccaa_hospital = normalize_ccaa(ccaa_hospital, 'hospital')
+ccaa_hospital = delay_date(ccaa_hospital)
 ccaa_uci = data[etl_cfg.input.files.uci]
 ccaa_uci = normalize_ccaa(ccaa_uci, 'uci')
+ccaa_uci = delay_date(ccaa_uci)
 todos_ccaa = ccaa_casos.merge(ccaa_altas, how='left', on=['fecha', 'ccaa'])
 todos_ccaa = todos_ccaa.merge(ccaa_fallecidos, how='left', on=['fecha', 'ccaa'])
 todos_ccaa = todos_ccaa.merge(ccaa_hospital, how='left', on=['fecha', 'ccaa'])
@@ -142,6 +157,7 @@ write_to_file(json_file, etl_cfg.output.path + 'casos_ccaa_1_dato.json-stat')
 # Datos nacionales acumulados diarios
 # fecha,casos,altas,fallecimientos,ingresos_uci,hospitalizados
 nacional = data[etl_cfg.input.files.nacional]
+nacional = delay_date(nacional)
 nacional.set_index('fecha')
 nacional.rename(columns={
     'casos': 'casos-acumulado',
@@ -296,6 +312,7 @@ write_to_file(json_file, etl_cfg.output.path + 'fallecidos_nacional_edad_sexo.js
 # Casos en Cantabria
 # fecha,cod_ine,CCAA,total
 casos = data[etl_cfg.input.files.casos]
+casos = delay_date(casos)
 casos = transform(casos, 'casos-acumulado')
 # cifra más reciente
 casos_last = casos.tail(1)
@@ -335,6 +352,7 @@ write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_variacion.json-s
 # Altas en Cantabria
 # fecha,cod_ine,CCAA,total
 altas = data[etl_cfg.input.files.altas]
+altas = delay_date(altas)
 altas = transform(altas, 'altas-acumulado')
 # cifra más reciente
 altas_last = altas.tail(1)
@@ -358,6 +376,7 @@ write_to_file(json_file, etl_cfg.output.path + 'altas_cantabria_diario.json-stat
 # Ingresados en UCI en Cantabria
 # fecha,cod_ine,CCAA,total
 uci = data[etl_cfg.input.files.uci]
+uci = delay_date(uci)
 uci = transform(uci, 'uci-acumulado')
 # cifra más reciente
 uci_last = uci.tail(1)
@@ -381,6 +400,7 @@ write_to_file(json_file, etl_cfg.output.path + 'uci_cantabria_diario.json-stat')
 # Fallecidos en Cantabria
 # fecha,cod_ine,CCAA,total
 fallecidos = data[etl_cfg.input.files.fallecidos]
+fallecidos = delay_date(fallecidos)
 fallecidos = transform(fallecidos, 'fallecidos-acumulado')
 # cifra más reciente
 fallecidos_last = fallecidos.tail(1)
@@ -422,6 +442,7 @@ write_to_file(json_file, etl_cfg.output.path + 'todos_cantabria.json-stat')
 
 # Comparación casos Cantabria y España
 espana = data[etl_cfg.input.files.nacional]
+espana = delay_date(espana)
 cant_esp = espana.merge(casos, how='left', on='fecha')
 cant_esp.drop('altas-acumulado', axis=1, inplace=True)
 cant_esp.drop('fallecidos-acumulado', axis=1, inplace=True)
