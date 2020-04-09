@@ -264,22 +264,42 @@ write_to_file(json_file, etl_cfg.output.path + 'uci_nacional_1_dato.json-stat')
 #altas
 altas_nacional_diario = nacional[['fecha', 'altas']]
 json_file = to_json(altas_nacional_diario, ['fecha'], ['altas'])
+json_obj = json.loads(json_file)
+json_obj['dimension']['Variables']['category']['unit'] = \
+    {'fallecidos': {'decimals': 0, 'label': 'Número de personas'}}
+json_file = json.dumps(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'altas_nacional_diario.json-stat')
 # casos
 casos_nacional_diario = nacional[['fecha', 'casos']]
 json_file = to_json(casos_nacional_diario, ['fecha'], ['casos'])
+json_obj = json.loads(json_file)
+json_obj['dimension']['Variables']['category']['unit'] = \
+    {'fallecidos': {'decimals': 0, 'label': 'Número de personas'}}
+json_file = json.dumps(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'casos_nacional_diario.json-stat')
 # fallecidos
 fallecidos_nacional_diario = nacional[['fecha', 'fallecidos']]
 json_file = to_json(fallecidos_nacional_diario, ['fecha'], ['fallecidos'])
+json_obj = json.loads(json_file)
+json_obj['dimension']['Variables']['category']['unit'] = \
+    {'fallecidos': {'decimals': 0, 'label': 'Número de personas'}}
+json_file = json.dumps(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'fallecidos_nacional_diario.json-stat')
 # hospital
 hospital_nacional_diario = nacional[['fecha', 'hospital']]
 json_file = to_json(hospital_nacional_diario, ['fecha'], ['hospital'])
+json_obj = json.loads(json_file)
+json_obj['dimension']['Variables']['category']['unit'] = \
+    {'fallecidos': {'decimals': 0, 'label': 'Número de personas'}}
+json_file = json.dumps(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'hospital_nacional_diario.json-stat')
 # uci
 uci_nacional_diario = nacional[['fecha', 'uci']]
 json_file = to_json(uci_nacional_diario, ['fecha'], ['uci'])
+json_obj = json.loads(json_file)
+json_obj['dimension']['Variables']['category']['unit'] = \
+    {'fallecidos': {'decimals': 0, 'label': 'Número de personas'}}
+json_file = json.dumps(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'uci_nacional_diario.json-stat')
 
 # Datos nacionales por rango de edad y sexo
@@ -333,6 +353,10 @@ write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_acumulado.json-s
 # diario
 casos_diario = casos[['fecha', 'casos']].copy()
 json_file = to_json(casos_diario, ['fecha'], ['casos'])
+json_obj = json.loads(json_file)
+json_obj['dimension']['Variables']['category']['unit'] = \
+    {'fallecidos': {'decimals': 0, 'label': 'Número de personas'}}
+json_file = json.dumps(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_diario.json-stat')
 
 # tasa de variación diaria (porcentaje)
@@ -373,6 +397,10 @@ write_to_file(json_file, etl_cfg.output.path + 'altas_cantabria_acumulado.json-s
 # diario
 altas_diario = altas[['fecha', 'altas']].copy()
 json_file = to_json(altas_diario, ['fecha'], ['altas'])
+json_obj = json.loads(json_file)
+json_obj['dimension']['Variables']['category']['unit'] = \
+    {'fallecidos': {'decimals': 0, 'label': 'Número de personas'}}
+json_file = json.dumps(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'altas_cantabria_diario.json-stat')
 
 # Ingresados en UCI en Cantabria
@@ -397,6 +425,10 @@ write_to_file(json_file, etl_cfg.output.path + 'uci_cantabria_acumulado.json-sta
 # diario
 uci_diario = uci[['fecha', 'uci']].copy()
 json_file = to_json(uci_diario, ['fecha'], ['uci'])
+json_obj = json.loads(json_file)
+json_obj['dimension']['Variables']['category']['unit'] = \
+    {'fallecidos': {'decimals': 0, 'label': 'Número de personas'}}
+json_file = json.dumps(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'uci_cantabria_diario.json-stat')
 
 # Fallecidos en Cantabria
@@ -416,11 +448,19 @@ fallecidos = deacumulate(fallecidos, 'fallecidos-acumulado', 'fallecidos')
 fallecidos_acumulado = fallecidos[['fecha', 'fallecidos-acumulado']].copy()
 fallecidos_acumulado.rename(columns={'fallecidos-acumulado': 'fallecidos'}, inplace=True)
 json_file = to_json(fallecidos_acumulado, ['fecha'], ['fallecidos'])
+json_obj = json.loads(json_file)
+json_obj['dimension']['Variables']['category']['unit'] = \
+    {'fallecidos': {'decimals': 0, 'label': 'Número de personas acumulado'}}
+json_file = json.dumps(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'fallecidos_cantabria_acumulado.json-stat')
 
 # diario
 fallecidos_diario = fallecidos[['fecha', 'fallecidos']].copy()
 json_file = to_json(fallecidos_diario, ['fecha'], ['fallecidos'])
+json_obj = json.loads(json_file)
+json_obj['dimension']['Variables']['category']['unit'] = \
+    {'fallecidos': {'decimals': 0, 'label': 'Número de personas'}}
+json_file = json.dumps(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'fallecidos_cantabria_diario.json-stat')
 
 # Todas las variables acumulado en Cantabria
@@ -463,6 +503,9 @@ cant_esp.rename(columns={
     'casos-acumulado_x': 'casos-espana',
     'casos-acumulado_y': 'casos-cantabria'}, inplace=True)
 json_file = to_json(cant_esp, ['fecha'], ['casos-espana', 'casos-cantabria'])
+json_obj = json.loads(json_file)
+json_obj['dimension']['Variables']['category']['unit'] = etl_cfg.metadata.casos_cantabria_espana
+json_file = json.dumps(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_espana.json-stat')
 
 """Fourth step: push JSON-Stat files to repository."""

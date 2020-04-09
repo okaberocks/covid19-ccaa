@@ -32,6 +32,10 @@ params = {
             'altas': {'decimals': 0, 'label': 'Número de personas acumulado'},
             'fallecidos': {'decimals': 0, 'label': 'Número de personas acumulado'},
             'uci': {'decimals': 0, 'label': 'Número de personas acumulado'}
+        },
+        'casos_cantabria_espana': {
+            'casos-espana': {'decimals': 0, 'label': 'Número de personas acumulado'},
+            'casos-cantabria': {'decimals': 0, 'label': 'Número de personas acumulado'}
         }
     }
 }
