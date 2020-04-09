@@ -27,6 +27,10 @@ params = {
     },
     'metadata': {
         'source': 'Ministerio de Sanidad, Consumo y Bienestar Social. A partir de ficheros de datos elaborados por DATADISTA.COM',
+        'todos_cantabria': '"casos": {"decimals":0,"label":"Número de personas acumulado"},' + \
+            '"altas": {"decimals":0,"label":"Número de personas acumulado"},' + \
+            '"fallecidos": {"decimals":0,"label":"Número de personas acumulado"},' + \
+            '"uci": {"decimals":0,"label":"Número de personas acumulado"}'
     }
 }
 

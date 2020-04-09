@@ -59,12 +59,6 @@ def to_json(df, id_vars, value_vars):
     dataset.setdefault('role', metric)
     return dataset.write(output='jsonstat')
 
-def add_to_json(jstr, obj):
-    """Add a Python object to a JSON string."""
-    json_obj = json.loads(jstr)
-    json_obj.update(obj)
-    return json.dumps(json_obj)
-
 def write_to_file(json_data, file_name):
     file = open(file_name, 'w')
     file.write(json_data)
@@ -446,7 +440,9 @@ json_file = to_json(
     todas_acumulado,
     ['fecha'],
     ['casos', 'altas', 'fallecidos', 'uci'])
-json_file = add_to_json(json_file, {'extension': {'units': 'Casos, altas, fallecidos, uci: Número de casos acumulados'}})
+json_obj = json.loads(json_file)
+json_obj["unit"] = {etl_cfg.metadata.todos_cantabria}
+print(json_obj)
 write_to_file(json_file, etl_cfg.output.path + 'todos_cantabria.json-stat')
 
 # Comparación casos Cantabria y España
