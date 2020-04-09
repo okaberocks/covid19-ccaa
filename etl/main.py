@@ -19,6 +19,8 @@ from etlstat.extractor.extractor import csv
 
 from git import GitCommandError, Repo
 
+import json
+
 from numpy import arange
 
 from pyjstat import pyjstat
@@ -56,6 +58,12 @@ def to_json(df, id_vars, value_vars):
     metric = {'metric': ['Variables']}
     dataset.setdefault('role', metric)
     return dataset.write(output='jsonstat')
+
+def add_to_json(jstr, obj):
+    """Add a Python object to a JSON string."""
+    json_obj = json.loads(jstr)
+    json_obj.update(obj)
+    return json.dumps(json_obj)
 
 def write_to_file(json_data, file_name):
     file = open(file_name, 'w')
@@ -438,6 +446,7 @@ json_file = to_json(
     todas_acumulado,
     ['fecha'],
     ['casos', 'altas', 'fallecidos', 'uci'])
+json_file = add_to_json(json_file, {'units': 'Número de casos acumulados'})
 write_to_file(json_file, etl_cfg.output.path + 'todos_cantabria.json-stat')
 
 # Comparación casos Cantabria y España
