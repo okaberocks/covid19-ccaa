@@ -446,7 +446,6 @@ json_file = to_json(
     todas_acumulado,
     ['fecha'],
     ['casos', 'altas', 'fallecidos', 'uci'])
-json_file = add_to_json(json_file, {'extension': {'units': 'Casos, altas, fallecidos, uci: Número de casos acumulados'}})
 write_to_file(json_file, etl_cfg.output.path + 'todos_cantabria.json-stat')
 
 # Comparación casos Cantabria y España
