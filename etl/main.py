@@ -116,6 +116,8 @@ alojamientos = data[etl_cfg.input.files.alojamientos]
 alojamientos.rename(
     columns={'CCAA': 'ccaa', 'lat': 'Latitud', 'long': 'Longitud'},
     inplace=True)
+alojamientos.loc[
+    (alojamientos.provincia == 'Santander'), 'provincia'] = 'Cantabria'
 alojamientos['id'] = arange(len(alojamientos))
 json_file = to_json(
     alojamientos,
@@ -517,3 +519,5 @@ try:
     origin.push()
 except GitCommandError:
     pass
+
+print("Proceso terminado con éxito")
