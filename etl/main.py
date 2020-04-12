@@ -96,19 +96,25 @@ restauracion = data[etl_cfg.input.files.restauracion]
 restauracion.rename(
     columns = {
         'NOMBRE': 'nombre',
-        'DIRECCION': 'direccion',
-        'CIUDAD': 'ciudad',
-        'PROVINCIA': 'provincia',
-        'LATITUD': 'Latitud',
-        'LONGITUD': 'Longitud',
-        'COMENTARIO': 'comentario'
+        'Tipo': 'tipo',
+        'Direccion': 'direccion',
+        'Municipio': 'municipio',
+        'Provincia': 'provincia',
+        'Comentarios': 'comentario',
+        'Horario': 'horario',
+        'Telefono': 'telefono',
+        'Bocata_Bebida_Caliente': 'bocadillo_bebida_caliente',
+        'Comida_Preparada': 'comida_preparada',
+        'Ducha': 'ducha'
     }, inplace=True)
 restauracion['id'] = arange(len(restauracion))
 json_file = to_json(
     restauracion,
     ['id'],
-    ['nombre', 'direccion', 'ciudad',
-     'provincia', 'Latitud', 'Longitud', 'comentario'])
+    ['nombre', 'tipo', 'direccion', 'municipio',
+     'provincia', 'Latitud', 'Longitud', 'comentario',
+     'horario', 'telefono', 'bocadillo_bebida_caliente',
+     'comida_preparada', 'ducha'])
 write_to_file(json_file, etl_cfg.output.path + 'puntos_restauracion.json-stat')
 
 # Alojamientos turísticos BOE 2020 4194
