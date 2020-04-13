@@ -104,6 +104,8 @@ eess.rename(
         'Rótulo': 'rotulo'
     }, inplace=True)
 eess['id'] = arange(len(eess))
+eess['Latitud'] = eess['Latitud'].str.replace(',','.')
+eess['Longitud'] = eess['Longitud'].str.replace(',','.')
 json_file = to_json(
     eess,
     ['id'],
