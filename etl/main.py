@@ -91,6 +91,27 @@ o.pull()
 data = csv(etl_cfg.input.dir_path, sep=',')
 
 """Third step: ETL processing."""
+# Estaciones de servicio
+eess = data[etl_cfg.input.files.eess]
+eess.rename(
+    columns = {
+        'Horario': 'horario',
+        'Provincia': 'provincia',
+        'Municipio': 'municipio',
+        'Código\nPostal': 'codigo_postal',
+        'Dirección': 'direccion',
+        'Margen': 'margen',
+        'Rótulo': 'rotulo'
+    }, inplace=True)
+eess['id'] = arange(len(eess))
+json_file = to_json(
+    eess,
+    ['id'],
+    ['horario', 'provincia', 'municipio',
+     'codigo_postal', 'direccion', 'Latitud', 'Longitud',
+     'margen', 'rotulo'])
+write_to_file(json_file, etl_cfg.output.path + 'eess_horario_flexible_habitual.json-stat')
+
 # Puntos de restauración
 restauracion = data[etl_cfg.input.files.restauracion]
 restauracion.rename(

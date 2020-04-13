@@ -13,6 +13,7 @@ params = {
             'alojamientos': 'alojamientos_turisticos_boe_2020_4194.csv',
             'altas': 'ccaa_covid19_altas_long.csv',
             'casos': 'ccaa_covid19_casos_long.csv',
+            'eess': 'EESS_horario_flexible_habitual.csv',
             'fallecidos': 'ccaa_covid19_fallecidos_long.csv',
             'hospital': 'ccaa_covid19_hospitalizados_long.csv',
             'nacional': 'nacional_covid19.csv',
