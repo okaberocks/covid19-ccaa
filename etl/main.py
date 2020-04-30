@@ -337,7 +337,7 @@ write_to_file(json_file, etl_cfg.output.path + 'uci_nacional_diario.json-stat')
 nacional_edad = data[etl_cfg.input.files.nacional_edad]
 nacional_edad.drop(nacional_edad[nacional_edad.rango_edad == 'Total'].index, inplace=True)
 nacional_edad.drop(nacional_edad[nacional_edad.sexo == 'ambos'].index, inplace=True)
-last_date = nacional_edad['fecha'].max()
+last_date = nacional_edad.fecha.max()
 nacional_edad.drop(nacional_edad[nacional_edad.fecha != last_date].index, inplace=True)
 nacional_edad.drop('fecha', axis=1, inplace=True)
 nacional_edad.rename(columns={
