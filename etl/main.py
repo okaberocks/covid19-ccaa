@@ -193,7 +193,7 @@ nacional = data[etl_cfg.input.files.nacional]
 nacional = delay_date(nacional)
 nacional.set_index('fecha')
 nacional.rename(columns={
-    'casos': 'casos-acumulado',
+    'casos_total': 'casos-acumulado',
     'altas': 'altas-acumulado',
     'fallecimientos': 'fallecidos-acumulado',
     'ingresos_uci': 'uci-acumulado',
