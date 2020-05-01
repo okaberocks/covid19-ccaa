@@ -393,7 +393,7 @@ write_to_file(json_file, etl_cfg.output.path + 'casos_cantabria_diario.json-stat
 # tasa de variación diaria (porcentaje)
 # T(d) = 100 * ((Casos(d) - Casos(d-1))/Casos(d-1))
 casos_tasa = casos_acumulado[['fecha', 'casos']].copy()
-casos_tasa.drop(casos_tasa[casos_tasa.index < 9].index, inplace=True)
+casos_tasa.drop(casos_tasa[casos_tasa.index < 10].index, inplace=True)
 casos_tasa.reset_index(drop=True, inplace=True)
 for i in range(1, len(casos_tasa)):
     if casos_tasa.loc[i-1, 'casos'] > 0:
