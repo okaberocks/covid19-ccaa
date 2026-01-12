@@ -25,4 +25,4 @@ pyjstat = {index = "pypi","version >" = "2.2.0"}
 python-decouple = {index = "pypi",version = "*"}
 
 [requires]
-python_version = "3.7"
+python_version = "3.9"
